@@ -1,22 +1,24 @@
-//taskkill /F /IM ApplicationName.exe
 #pragma once
 
 #pragma comment(lib, "kernel32.lib")
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "gdi32.lib")
-//#pragma comment(lib, "comdlg32.lib")
 
 #include <stdio.h>
 #include <time.h>
 #include <windows.h>
 
-#include "Engine.c"
-#include "Cube.c"
-#include "Terrain.c"
+#include "settings.h"
+#include "Render.h"
+#include "Engine.h"
 
 HINSTANCE hinst; 
 HWND m_hwnd;
+RenderBuffer renderBuffer;
 Engine engine;
+
+
+
 
 int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow); 
 BOOL InitApplication(HINSTANCE hinstance);
@@ -34,7 +36,7 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         
             RunMessageLoop();
         
-        clearMemory();
+        free_RenderBuffer(&renderBuffer);
     }
     return 0;
 } 
@@ -112,27 +114,31 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 void RunMessageLoop() {
 
-    initRenderer(m_hwnd);
-
-    double FPS_CAP = 1.0 / 60;
-    clock_t currentTime = clock();
-    clock_t previousTime = clock();
-    double delta = 0;
-    clock_t timer = clock();
-    int testFPS = 0, FPS = 0;
-
+    initRenderer(m_hwnd, &renderBuffer);
     initEngine(&engine);
-    Model terrain;
-    generateTerrain(&terrain, 1000, 10);
-    addModel(&engine, &terrain);
-    Light light1;
-    Color lightColor;   lightColor.RGBA.r = 50;    lightColor.RGBA.g = 50;    lightColor.RGBA.b = 50;
-    initLight(&light1, AMBIENT, lightColor, (Vector3){0, 0, 0}, (Vector3){0, 0, 0}, (Vector3){0});
-    addLight(&engine, &light1);
-    Light light2;
-    lightColor.RGBA.r = 180;    lightColor.RGBA.g = 200;    lightColor.RGBA.b = 30;
-    initLight(&light2, POINT_LIGHT, lightColor, (Vector3){0, 100, 0}, (Vector3){1, 0, 1}, (Vector3){1, 0.001f, 0.00002f});
-    addLight(&engine, &light2);
+    char a[16];
+    snprintf(a, 16, "z0:%f", engine.camera.z0);
+    OutputDebugString(a);
+
+    Model model;
+    initModel(&model, 1, 3);
+    model.position.z = 10;
+    initVertex(&model.vertices[0], (Vector3){   0, -100, 0});
+    initVertex(&model.vertices[1], (Vector3){-100,  100, 0});
+    initVertex(&model.vertices[2], (Vector3){ 100,  100, 0});
+    model.index[0] = 0;     model.index[1] = 1;     model.index[2] = 2;
+    model.vertices[0].color = (Color){0xFFFF0000};
+    model.vertices[1].color = (Color){0xFF00FF00};
+    model.vertices[2].color = (Color){0xFF0000FF};
+
+    addModel(&engine, &model);
+
+    double FPS_CAP       = 1.0 / 60;
+    clock_t currentTime  = clock();
+    clock_t previousTime = clock();
+    double delta         = 0;
+    clock_t timer        = clock();
+    int frames = 0, FPS = 0;
 
     while (1) {
         // Messages and user input
@@ -149,19 +155,19 @@ void RunMessageLoop() {
         previousTime = currentTime;
 
         if(delta >= FPS_CAP){
-            //model.rotation.y += 1 * delta;
             updateCamera(&engine.camera, delta);
+            updateModels(&engine);
             delta -= FPS_CAP;
         }
-        testFPS++;
+        frames++;
 
-        clearBuffer();
-        renderModels(&engine);
-        render(m_hwnd, FPS);
+        clearBuffer(&renderBuffer);
+        renderModels(&engine, &renderBuffer);
+        render(m_hwnd, &renderBuffer, FPS);
 
         if((double)(clock() - timer) >= CLOCKS_PER_SEC){
-            FPS = testFPS;
-            testFPS = 0;
+            FPS = frames;
+            frames = 0;
             timer = clock();
         }
     }

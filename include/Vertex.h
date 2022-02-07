@@ -1,5 +1,9 @@
 #pragma once
 
+#ifndef _INC_VERTEX_
+#define _INC_VERTEX_
+
+#include "dllsupport.c"
 #include "Vector.h"
 #include "Color.h"
 
@@ -11,4 +15,6 @@ typedef struct {
     Color color;
 } Vertex;
 
-void initVertex(Vertex* vertex, Vector3 position);
+void DLL initVertex(Vertex* vertex, Vector3 position);
+
+#endif

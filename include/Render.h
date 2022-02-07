@@ -1,19 +1,22 @@
 #pragma once
 
+#ifndef _INC_RENDER_
+#define _INC_RENDER_
+
 #include <windows.h>
+#include "dllsupport.c"
 
 typedef struct {
     void* memory;
-    int width;
-    int height;
+    //void* zBuffer;
+    BITMAPINFO bitmapInfo;
 } RenderBuffer;
 
-BITMAPINFO bitmapInfo;
-RenderBuffer renderBuffer;
+void DLL initRenderer(HWND hwnd, RenderBuffer* renderBuffer);
 
-void initRenderer(HWND hwnd);
+void DLL clearBuffer(RenderBuffer* renderBuffer);
+void DLL render(HWND hwnd, RenderBuffer* renderBuffer, int FPS);
 
-void clearBuffer();
-void render(HWND hwnd);
+void DLL free_RenderBuffer(RenderBuffer* renderBuffer);
 
-void clearMemory();
+#endif

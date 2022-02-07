@@ -1,15 +1,25 @@
 #pragma once
 
+#ifndef _INC_MODEL_
+#define _INC_MODEL_
+
+#include "dllsupport.c"
+
+#include <malloc.h>
+#include "Render.h"
 #include "Vertex.h"
 
 typedef struct {
     Vector3 position;
-    int noTriangles;
-    int noVertices;
+    Vector3 rotation;
+    int triangleCount;
+    int vertexCount;
     Vertex* vertices;
     unsigned char* index;
-    Vector3 rotation;
 } Model;
 
-void initModel(Model* model, int noTriangles, int noVertices);
-void deleteModel(Model* model);
+void DLL initModel(Model* model, int triangleCount, int vertexCount);
+void renderModel(Model* model, RenderBuffer* renderBuffer);
+void DLL deleteModel(Model* model);
+
+#endif

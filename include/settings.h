@@ -1,6 +1,8 @@
 #pragma once
 
-#define WIDTH 840
-#define HEIGHT 580
+#define WIDTH 960
+#define HEIGHT 540
 
-#define FOV 80
+#define FOV 90
+
+#define VIEW_DISTANCE 2 * 1000

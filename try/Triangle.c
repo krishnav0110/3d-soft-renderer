@@ -24,7 +24,8 @@ void renderTriangle(Vertex* v1, Vertex* v2, Vertex* v3, RenderBuffer* renderBuff
         v3 = temp;
     }
 
-    /* storing the projected points in vector structure to be easily
+    /* 
+     * storing the projected points in vector structure to be easily
      * accessible for further calculations.
      */
     Vector3 points[3];
@@ -43,7 +44,8 @@ void renderTriangle(Vertex* v1, Vertex* v2, Vertex* v3, RenderBuffer* renderBuff
         int end_x = points[0].x + y * slope2;
 
         Color color_x1, color_x2;
-        /* sorting the intersection points in ascending order
+        /* 
+         * sorting the intersection points in ascending order
          * 
          * lerping the color along the y-axis
          */
@@ -60,8 +62,8 @@ void renderTriangle(Vertex* v1, Vertex* v2, Vertex* v3, RenderBuffer* renderBuff
         float lerpStep_x = 1.0f / (end_x - start_x);
 
         for(int x = start_x; x <= end_x; x++){
-            //just in case safe measure
-            if(WIDTH * (y + points[0].y) + x >= WIDTH * HEIGHT)
+            //just in case safe measure to prevent writing outside the screen
+            if(x >= WIDTH || x < 0 || y < 0 || y + points[0].y >= HEIGHT)
                 continue;
 
             //rendering the pixel
@@ -83,7 +85,8 @@ void renderTriangle(Vertex* v1, Vertex* v2, Vertex* v3, RenderBuffer* renderBuff
         int end_x = off_x + y * slope2;
 
         Color color_x1, color_x2;
-        /* sorting the intersection points in ascending order
+        /* 
+         * sorting the intersection points in ascending order
          * 
          * lerping the color along the y-axis
          */
@@ -101,8 +104,8 @@ void renderTriangle(Vertex* v1, Vertex* v2, Vertex* v3, RenderBuffer* renderBuff
         float lerpStep_x = 1.0f / (end_x - start_x);
 
         for(int x = start_x; x <= end_x; x++){
-            //just in case safe measure
-            if(WIDTH * (y + points[1].y) + x >= WIDTH * HEIGHT)
+            //just in case safe measure to prevent writing outside the screen
+            if(x >= WIDTH || x < 0 || y < 0 || y + points[1].y >= HEIGHT)
                 continue;
 
             //rendering the pixel
@@ -122,8 +125,9 @@ void clipTriangle_Plane(Vertex* vertices, int* verticesCount, Vector3 planePoint
     for(int i = 0; i < noVertices; i += 3){
         insideVerticesCount = outsideVerticesCount = 0;
 
-        /* checking the vertices of the triangle are whether in front or 
-         * behing the plane and storting them in respective list.
+        /* 
+         * checking the vertices of the triangle are whether in front or 
+         * behind the plane and storting them in respective list.
          */
         for(int j = 0; j < 3; j++){
             Vector3 planeToPointVector = (Vector3){vertices[j].projectedPoint.x - planePoint.x, vertices[j].projectedPoint.y - planePoint.y, vertices[j].projectedPoint.z - planePoint.z};
@@ -200,7 +204,7 @@ int clipTriangle(Vertex* v1, Vertex* v2, Vertex* v3, Vertex* vertices){
     clipTriangle_Plane(vertices, &verticesCount, (Vector3){0, 1, 0}, (Vector3){0, 1, 0});
     //BOTTOM
     clipTriangle_Plane(vertices, &verticesCount, (Vector3){0, HEIGHT - 1, 0}, (Vector3){0, -1, 0});
-    //Z FRONT
+    //Z NEAR
     clipTriangle_Plane(vertices, &verticesCount, (Vector3){0, 0, 0}, (Vector3){0, 0, 1});
 
     return verticesCount;

@@ -11,7 +11,7 @@ void generateTerrain(Model* model, float size, int verticesCount){
     int index = 0;
     for(int i = 0; i < verticesCount; i++){
         for(int j = 0; j < verticesCount; j++){
-            initVertex(&model->vertices[index], (Vector3){j * tileSize, rand() / 1500, i * tileSize});
+            initVertex(&model->vertices[index], (Vector3){j * tileSize, 0, i * tileSize});
             model->vertices[index++].normal = (Vector3){0, 1, 0};
         }
     }

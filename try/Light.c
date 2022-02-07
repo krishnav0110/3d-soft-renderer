@@ -35,7 +35,7 @@ void applyLight(Vector3* position, Vector3* normal, Color* lightAmount, Light* l
             brightness = 0;
     }
     else if(light -> type == POINT_LIGHT){
-        Vector3 toLightVector = (Vector3){light->position.x - position->x, light->position.y - position->y, light->position.z - position->z};
+        Vector3 toLightVector = {light->position.x - position->x, light->position.y - position->y, light->position.z - position->z};
         float distance = sqrtf(toLightVector.x * toLightVector.x + toLightVector.y * toLightVector.y + toLightVector.z * toLightVector.z);
         toLightVector = normalize(&toLightVector);
         brightness = dotProduct(&toLightVector, normal);

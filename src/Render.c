@@ -1,37 +1,40 @@
 #pragma once
 
-#pragma comment(lib, "kernel32.lib")
-#pragma comment(lib, "user32.lib")
-#pragma comment(lib, "gdi32.lib")
+#include <stdio.h>
 
 #include "settings.h"
 #include "Render.h"
 
-void initRenderer(HWND hwnd){
-    renderBuffer.memory = VirtualAlloc(0, WIDTH * HEIGHT * 4, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
-    renderBuffer.width = WIDTH;
-    renderBuffer.height = HEIGHT;
+void initRenderer(HWND hwnd, RenderBuffer* renderBuffer){
+    renderBuffer -> memory = VirtualAlloc(0, WIDTH * HEIGHT * 4, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 
-    bitmapInfo.bmiHeader.biSize = sizeof(bitmapInfo.bmiHeader);
-    bitmapInfo.bmiHeader.biWidth = WIDTH;
-    bitmapInfo.bmiHeader.biHeight = -HEIGHT;
-    bitmapInfo.bmiHeader.biPlanes = 1;
-    bitmapInfo.bmiHeader.biBitCount = 32;
-    bitmapInfo.bmiHeader.biCompression = BI_RGB;
+    renderBuffer -> bitmapInfo.bmiHeader.biSize        = sizeof(renderBuffer->bitmapInfo.bmiHeader);
+    renderBuffer -> bitmapInfo.bmiHeader.biWidth       = WIDTH;
+    renderBuffer -> bitmapInfo.bmiHeader.biHeight      = -HEIGHT;
+    renderBuffer -> bitmapInfo.bmiHeader.biPlanes      = 1;
+    renderBuffer -> bitmapInfo.bmiHeader.biBitCount    = 32;
+    renderBuffer -> bitmapInfo.bmiHeader.biCompression = BI_RGB;
 }
 
-void clearBuffer(){
-    int* pixel = (int*) renderBuffer.memory;
-    for(int i = 0; i < renderBuffer.width * renderBuffer.height; i++)
+void clearBuffer(RenderBuffer* renderBuffer){
+    int* pixel = (int*) renderBuffer -> memory;
+    for(int i = 0; i < WIDTH * HEIGHT; i++)
         *pixel++ = 0;
 }
 
-void render(HWND hwnd){
+void render(HWND hwnd, RenderBuffer* renderBuffer, int FPS){
+    char text[8];
+    snprintf(text, 8, "fps:%d", FPS);
+
     HDC hdc = GetDC(hwnd);
-    StretchDIBits(hdc, 0, 0, renderBuffer.width, renderBuffer.height, 0, 0, renderBuffer.width, renderBuffer.height, renderBuffer.memory, &bitmapInfo, DIB_RGB_COLORS, SRCCOPY);
+    StretchDIBits(hdc, 0, 0, WIDTH, HEIGHT, 0, 0, WIDTH, HEIGHT, renderBuffer->memory, &renderBuffer->bitmapInfo, DIB_RGB_COLORS, SRCCOPY);
+
+    RECT rect;
+    GetWindowRect(hwnd, &rect);
+    TextOut(hdc, 0, 0, text, strlen(text));
     ReleaseDC(hwnd, hdc);
 }
 
-void clearMemory(){
-    VirtualFree(renderBuffer.memory, 0, MEM_RELEASE);
+void free_RenderBuffer(RenderBuffer* renderBuffer){
+    VirtualFree(renderBuffer -> memory, 0, MEM_RELEASE);
 }

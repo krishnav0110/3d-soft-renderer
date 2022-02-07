@@ -1,26 +1,31 @@
 #pragma once
-#include <windows.h>
 
+#ifndef _INC_ENGINE_
+#define _INC_ENGINE_
+
+#include "dllsupport.c"
+
+#include <windows.h>
 #include "Camera.h"
-#include "Light.h"
 #include "Model.h"
 
 typedef struct {
-    float z0;
     Camera camera;
-    int noModels;
+    int modelCount;
     Model* models[5];
-    int noLights;
-    Light* lights[5];
 } Engine;
 
-void initEngine(Engine* engine);
+void DLL initEngine(Engine* engine);
+void DLL addModel(Engine* engine, Model* model);
 
-void handleKeyDown(Engine* engine, WPARAM wParam);
-void handleKeyUp(Engine* engine, WPARAM wParam);
-
-void addModel(Engine* engine, Model* model);
-void addLight(Engine* engine, Light* light);
+void DLL handleKeyDown(Engine* engine, WPARAM wParam);
+void DLL handleKeyUp(Engine* engine, WPARAM wParam);
 
 void updateModel(Model* model, Engine* engine);
-void renderModels(Engine* engine);
+
+void DLL updateModels(Engine* engine);
+void DLL renderModels(Engine* engine, RenderBuffer* renderBuffer);
+
+Vector3 applyPerspective(Vector3* vec, Camera* camera);
+
+#endif

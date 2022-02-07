@@ -8,8 +8,21 @@
 
 #include <stdio.h>
 #include <time.h>
+#include <windows.h>
 
-#include "App.h"
+#include "Engine.c"
+#include "Cube.c"
+#include "Terrain.c"
+
+HINSTANCE hinst; 
+HWND m_hwnd;
+Engine engine;
+
+int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow); 
+BOOL InitApplication(HINSTANCE hinstance);
+BOOL InitInstance(HINSTANCE hinstance, int nCmdShow) ;
+LRESULT CALLBACK MainWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+void RunMessageLoop();
 
  
 int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) { 
@@ -105,18 +118,20 @@ void RunMessageLoop() {
     clock_t currentTime = clock();
     clock_t previousTime = clock();
     double delta = 0;
+    clock_t timer = clock();
+    int testFPS = 0, FPS = 0;
 
     initEngine(&engine);
-    Model model;
-    initCube(&model, 0, 0, 300, 200);
-    addModel(&engine, &model);
+    Model terrain;
+    generateTerrain(&terrain, 1000, 10);
+    addModel(&engine, &terrain);
     Light light1;
-    Color lightColor;   lightColor.RGBA.r = 80;    lightColor.RGBA.g = 80;    lightColor.RGBA.b = 80;
-    initLight(&light1, AMBIENT, lightColor, (Vector3){0, 0, 0}, (Vector3){0, 0, 0}, 0);
+    Color lightColor;   lightColor.RGBA.r = 50;    lightColor.RGBA.g = 50;    lightColor.RGBA.b = 50;
+    initLight(&light1, AMBIENT, lightColor, (Vector3){0, 0, 0}, (Vector3){0, 0, 0}, (Vector3){0});
     addLight(&engine, &light1);
     Light light2;
-    lightColor.RGBA.r = 255;    lightColor.RGBA.g = 255;    lightColor.RGBA.b = 255;
-    initLight(&light2, DIRECTIONAL, lightColor, (Vector3){1, 0, 1}, (Vector3){0, 0, 0}, 0);
+    lightColor.RGBA.r = 180;    lightColor.RGBA.g = 200;    lightColor.RGBA.b = 30;
+    initLight(&light2, POINT_LIGHT, lightColor, (Vector3){0, 100, 0}, (Vector3){1, 0, 1}, (Vector3){1, 0.0001f, 0.00002f});
     addLight(&engine, &light2);
 
     while (1) {
@@ -134,13 +149,20 @@ void RunMessageLoop() {
         previousTime = currentTime;
 
         if(delta >= FPS_CAP){
-            model.rotation.y += 30 * delta;
+            //model.rotation.y += 1 * delta;
             updateCamera(&engine.camera, delta);
             delta -= FPS_CAP;
         }
+        testFPS++;
 
         clearBuffer();
         renderModels(&engine);
-        render(m_hwnd);
+        render(m_hwnd, FPS);
+
+        if((double)(clock() - timer) >= CLOCKS_PER_SEC){
+            FPS = testFPS;
+            testFPS = 0;
+            timer = clock();
+        }
     }
 }

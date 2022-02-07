@@ -4,6 +4,7 @@ typedef struct {
     void* memory;
     int width;
     int height;
+    void* zBuffer;
 } RenderBuffer;
 
 BITMAPINFO bitmapInfo;
@@ -11,6 +12,7 @@ RenderBuffer renderBuffer;
 
 void initRenderer(HWND hwnd){
     renderBuffer.memory = VirtualAlloc(0, WIDTH * HEIGHT * 4, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+    renderBuffer.zBuffer = VirtualAlloc(0, WIDTH * HEIGHT * 4, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
     renderBuffer.width = WIDTH;
     renderBuffer.height = HEIGHT;
 

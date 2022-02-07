@@ -95,10 +95,10 @@ void renderModels(Engine* engine){
             points[1] = model -> vertices[model -> index[j * 3 + 1]].projectedPoint;
             points[2] = model -> vertices[model -> index[j * 3 + 2]].projectedPoint;
 
-            Vector3 vec1 = (Vector3){points[1].x - points[0].x, points[1].y - points[0].y};
-            Vector3 vec2 = (Vector3){points[2].x - points[0].x, points[2].y - points[0].y};
+            if(points[0].z > VIEW_DISTANCE || points[1].z > VIEW_DISTANCE || points[2].z > VIEW_DISTANCE)
+                continue;
 
-            if((vec1.x * vec2.y - vec1.y * vec2.x) >= 0)
+            if(calcNormal(points, points + 1, points + 2).z >= 0)
                 continue;
 
             int verticesCount = clipTriangle(&model -> vertices[model -> index[j * 3    ]],
