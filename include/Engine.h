@@ -22,6 +22,7 @@ void DLL handleKeyDown(Engine* engine, WPARAM wParam);
 void DLL handleKeyUp(Engine* engine, WPARAM wParam);
 
 void updateModel(Model* model, Engine* engine);
+void renderModel(Model* model, Engine* engine, RenderBuffer* renderBuffer);
 
 void DLL updateModels(Engine* engine);
 void DLL renderModels(Engine* engine, RenderBuffer* renderBuffer);
