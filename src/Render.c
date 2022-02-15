@@ -16,10 +16,10 @@ void initRenderer(HWND hwnd, RenderBuffer* renderBuffer){
     renderBuffer -> bitmapInfo.bmiHeader.biCompression = BI_RGB;
 }
 
-void clearBuffer(RenderBuffer* renderBuffer){
+void clearBuffer(RenderBuffer* renderBuffer, Color color){
     int* pixel = (int*) renderBuffer -> memory;
-    for(int i = 0; i < WIDTH * HEIGHT; i++)
-        *pixel++ = 0;
+    for(int i = 0; i < WIDTH * HEIGHT; ++i)
+        *pixel++ = color.color;
 }
 
 void render(HWND hwnd, RenderBuffer* renderBuffer, int FPS){

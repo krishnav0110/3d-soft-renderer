@@ -3,6 +3,11 @@
 #include "Color.h"
 
 Color lerpColor(Color* c1, Color* c2, float t){
+    if(t > 1)
+        t = 1;
+    if(t < 0)
+        t = 0;
+
     Color toReturn;
     toReturn.RGBA.r = (unsigned char)((c2->RGBA.r - c1->RGBA.r) * t + c1->RGBA.r);
     toReturn.RGBA.g = (unsigned char)((c2->RGBA.g - c1->RGBA.g) * t + c1->RGBA.g);

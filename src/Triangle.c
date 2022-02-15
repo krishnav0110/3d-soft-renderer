@@ -40,9 +40,10 @@ void renderTriangle(Vertex* v1, Vertex* v2, Vertex* v3, RenderBuffer* renderBuff
     float lerpAmt_y1 = 0, lerpStep_y1 = 1.0f / (points[1].y - points[0].y);
     float lerpAmt_y2 = 0, lerpStep_y2 = 1.0f / (points[2].y - points[0].y);
 
-    for(int y = 0; y < points[1].y - points[0].y; y++){
+    for(int y = 0; y < points[1].y - points[0].y; ++y){
         int start_x = points[0].x + y * slope1;
         int end_x   = points[0].x + y * slope2;
+        int pos_y   = points[0].y + y;
 
         Color color_x1, color_x2;
         /* 
@@ -62,14 +63,14 @@ void renderTriangle(Vertex* v1, Vertex* v2, Vertex* v3, RenderBuffer* renderBuff
         float lerpAmt_x  = 0;
         float lerpStep_x = 1.0f / (end_x - start_x);
 
-        for(int x = start_x; x <= end_x; x++){
+        for(int x = start_x; x <= end_x; ++x){
             //just in case safe measure to prevent writing outside the screen
-            if(x >= WIDTH || x < 0 || y < 0 || y + points[0].y >= HEIGHT)
+            if(x >= WIDTH || x < 0 || pos_y < 0 || pos_y >= HEIGHT)
                 continue;
 
             //rendering the pixel
             Color color = lerpColor(&color_x1, &color_x2, lerpAmt_x);
-            pixel[WIDTH * (int)(y + points[0].y) + x] = color.color;
+            pixel[WIDTH * pos_y + x] = color.color;
             lerpAmt_x += lerpStep_x;
         }
         lerpAmt_y1 += lerpStep_y1;
@@ -81,9 +82,10 @@ void renderTriangle(Vertex* v1, Vertex* v2, Vertex* v3, RenderBuffer* renderBuff
     int off_x  = points[0].x + (points[1].y - points[0].y) * slope2;
     lerpAmt_y1 = 0; lerpStep_y1 = 1.0f / (points[2].y - points[1].y);
 
-    for(int y = 0; y < points[2].y - points[1].y; y++){
+    for(int y = 0; y < points[2].y - points[1].y; ++y){
         int start_x = points[1].x + y * slope1;
         int end_x   = off_x + y * slope2;
+        int pos_y = points[1].y + y;
 
         Color color_x1, color_x2;
         /* 
@@ -104,14 +106,14 @@ void renderTriangle(Vertex* v1, Vertex* v2, Vertex* v3, RenderBuffer* renderBuff
         float lerpAmt_x  = 0;
         float lerpStep_x = 1.0f / (end_x - start_x);
 
-        for(int x = start_x; x <= end_x; x++){
+        for(int x = start_x; x <= end_x; ++x){
             //just in case safe measure to prevent writing outside the screen
-            if(x >= WIDTH || x < 0 || y < 0 || y + points[1].y >= HEIGHT)
+            if(x >= WIDTH || x < 0 || pos_y < 0 || pos_y >= HEIGHT)
                 continue;
 
             //rendering the pixel
             Color color = lerpColor(&color_x1, &color_x2, lerpAmt_x);
-            pixel[WIDTH * (int)(y + points[1].y) + x] = color.color;
+            pixel[WIDTH * pos_y + x] = color.color;
             lerpAmt_x += lerpStep_x;
         }
         lerpAmt_y1 += lerpStep_y1;
@@ -130,7 +132,7 @@ void clipTriangle_Plane(Vertex* vertices, int* verticesCount, Vector3 planePoint
          * checking the vertices of the triangle are whether in front or 
          * behind the plane and storting them in respective list.
          */
-        for(int j = 0; j < 3; j++){
+        for(int j = 0; j < 3; ++j){
             Vector3 planeToPointVector = (Vector3){vertices[j].projectedPoint.x - planePoint.x, vertices[j].projectedPoint.y - planePoint.y, vertices[j].projectedPoint.z - planePoint.z};
             if(dotProduct(&planeToPointVector, &planeNormal) <= 0)
                 outsideVertices[outsideVerticesCount++] = vertices[j];
@@ -147,8 +149,8 @@ void clipTriangle_Plane(Vertex* vertices, int* verticesCount, Vector3 planePoint
             v1.projectedPoint = planeLineIntersection(&insideVertices[0].projectedPoint, &outsideVertices[0].projectedPoint, &planePoint, &planeNormal);
             v2.projectedPoint = planeLineIntersection(&insideVertices[0].projectedPoint, &outsideVertices[1].projectedPoint, &planePoint, &planeNormal);
 
-            float k1 = (v1.projectedPoint.y - outsideVertices[0].projectedPoint.y) / (insideVertices[0].projectedPoint.y - outsideVertices[0].projectedPoint.y);
-            float k2 = (v2.projectedPoint.y - outsideVertices[1].projectedPoint.y) / (insideVertices[0].projectedPoint.y - outsideVertices[1].projectedPoint.y);
+            float k1 = distance(&v1.projectedPoint, &outsideVertices[0].projectedPoint) / distance(&insideVertices[0].projectedPoint, &outsideVertices[0].projectedPoint);
+            float k2 = distance(&v2.projectedPoint, &outsideVertices[1].projectedPoint) / distance(&insideVertices[0].projectedPoint, &outsideVertices[1].projectedPoint);
             v1.color = lerpColor(&outsideVertices[0].color, &insideVertices[0].color, k1);
             v2.color = lerpColor(&outsideVertices[1].color, &insideVertices[0].color, k2);
 
@@ -164,8 +166,8 @@ void clipTriangle_Plane(Vertex* vertices, int* verticesCount, Vector3 planePoint
             v1.projectedPoint = planeLineIntersection(&insideVertices[0].projectedPoint, &outsideVertices[0].projectedPoint, &planePoint, &planeNormal);
             v2.projectedPoint = planeLineIntersection(&insideVertices[1].projectedPoint, &outsideVertices[0].projectedPoint, &planePoint, &planeNormal);
             
-            float k1 = (v1.projectedPoint.y - outsideVertices[0].projectedPoint.y) / (insideVertices[0].projectedPoint.y - outsideVertices[0].projectedPoint.y);
-            float k2 = (v2.projectedPoint.y - outsideVertices[0].projectedPoint.y) / (insideVertices[1].projectedPoint.y - outsideVertices[0].projectedPoint.y);
+            float k1 = distance(&v1.projectedPoint, &outsideVertices[0].projectedPoint) / distance(&insideVertices[0].projectedPoint, &outsideVertices[0].projectedPoint);
+            float k2 = distance(&v2.projectedPoint, &outsideVertices[0].projectedPoint) / distance(&insideVertices[1].projectedPoint, &outsideVertices[0].projectedPoint);
             v1.color = lerpColor(&outsideVertices[0].color, &insideVertices[0].color, k1);
             v2.color = lerpColor(&outsideVertices[0].color, &insideVertices[1].color, k2);
 
@@ -193,9 +195,13 @@ void clipTriangle_Plane(Vertex* vertices, int* verticesCount, Vector3 planePoint
     }
 }
 
-int clipTriangle(Vertex* v1, Vertex* v2, Vertex* v3, Vertex* vertices){
-    vertices[0] = *v1;  vertices[1] = *v2;  vertices[2] = *v3;
+int clipTriangleZ(Vertex* vertices){
     int verticesCount = 3;
+    clipTriangle_Plane(vertices, &verticesCount, (Vector3){0, 0, 0}, (Vector3){0, 0, 1});
+    return verticesCount;
+}
+
+int clipTriangle(Vertex* vertices, int verticesCount){
 
     //LEFT
     clipTriangle_Plane(vertices, &verticesCount, (Vector3){1, 0, 0}, (Vector3){1, 0, 0});
@@ -205,8 +211,6 @@ int clipTriangle(Vertex* v1, Vertex* v2, Vertex* v3, Vertex* vertices){
     clipTriangle_Plane(vertices, &verticesCount, (Vector3){0, 1, 0}, (Vector3){0, 1, 0});
     //BOTTOM
     clipTriangle_Plane(vertices, &verticesCount, (Vector3){0, HEIGHT - 1, 0}, (Vector3){0, -1, 0});
-    //Z NEAR
-    clipTriangle_Plane(vertices, &verticesCount, (Vector3){0, 0, 0}, (Vector3){0, 0, 1});
 
     return verticesCount;
 }

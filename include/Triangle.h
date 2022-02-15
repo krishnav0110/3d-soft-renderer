@@ -8,6 +8,7 @@
 
 void renderTriangle(Vertex* v1, Vertex* v2, Vertex* v3, RenderBuffer* renderBuffer);
 
-int clipTriangle(Vertex* v1, Vertex* v2, Vertex* v3, Vertex* vertices);
+int clipTriangleZ(Vertex* vertices);
+int clipTriangle(Vertex* vertices, int verticesCount);
 
 #endif

@@ -19,7 +19,6 @@ typedef struct {
 } Model;
 
 void DLL initModel(Model* model, int triangleCount, int vertexCount);
-void renderModel(Model* model, RenderBuffer* renderBuffer);
 void DLL deleteModel(Model* model);
 
 #endif

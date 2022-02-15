@@ -25,8 +25,10 @@ void updateCamera(Camera* camera, float delta){
         camera -> rotation.y -= CAMERA_ROTATION_SPEED * delta;
     if(camera -> D_KeyPressed)
         camera -> rotation.y += CAMERA_ROTATION_SPEED * delta;
-    if(camera -> up_KeyPressed)
+    if(camera -> up_KeyPressed){
         camera -> position.y -= CAMERA_VELOCITY * delta;
-    if(camera -> down_KeyPressed)
+    }
+    if(camera -> down_KeyPressed){
         camera -> position.y += CAMERA_VELOCITY * delta;
+    }
 }

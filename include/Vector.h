@@ -12,6 +12,8 @@ typedef struct {
 Vector3 Translate(Vector3* vec, Vector3* translate);
 Vector3 Rotate(Vector3* vec, Vector3* rotation);
 
+float distance(Vector3* vec1, Vector3* vec2);
+
 Vector3 normalize(Vector3* vec);
 float dotProduct(Vector3* vec1, Vector3* vec2);
 

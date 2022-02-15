@@ -27,6 +27,11 @@ Vector3 Rotate(Vector3* vec, Vector3* rotation){
     return toReturn;
 }
 
+float distance(Vector3* vec1, Vector3* vec2){
+    Vector3 dist = {vec2->x - vec1->x, vec2->y - vec1->y, vec2->z - vec1->z};
+    return sqrtf(dist.x * dist.x + dist.y * dist.y + dist.z * dist.z);
+}
+
 Vector3 normalize(Vector3* vec){
     float magnitude = sqrtf(vec -> x * vec -> x + vec -> y * vec -> y + vec -> z * vec -> z);
     Vector3 toReturn;

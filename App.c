@@ -11,6 +11,8 @@
 #include "settings.h"
 #include "Render.h"
 #include "Engine.h"
+#include "Light.h"
+#include "Terrain.h"
 
 HINSTANCE hinst; 
 HWND m_hwnd;
@@ -116,22 +118,28 @@ void RunMessageLoop() {
 
     initRenderer(m_hwnd, &renderBuffer);
     initEngine(&engine);
-    char a[16];
-    snprintf(a, 16, "z0:%f", engine.camera.z0);
-    OutputDebugString(a);
 
     Model model;
-    initModel(&model, 1, 3);
-    model.position.z = 10;
-    initVertex(&model.vertices[0], (Vector3){   0, -100, 0});
-    initVertex(&model.vertices[1], (Vector3){-100,  100, 0});
-    initVertex(&model.vertices[2], (Vector3){ 100,  100, 0});
-    model.index[0] = 0;     model.index[1] = 1;     model.index[2] = 2;
-    model.vertices[0].color = (Color){0xFFFF0000};
-    model.vertices[1].color = (Color){0xFF00FF00};
-    model.vertices[2].color = (Color){0xFF0000FF};
-
+    generateTerrain(&model, 2000, 10);
+    //initModel(&model, 1, 3);
+    //model.position.z = 150;
+    //initVertex(&model.vertices[0], (Vector3){   0, -100, 0});
+    //initVertex(&model.vertices[1], (Vector3){-100,  100, 0});
+    //initVertex(&model.vertices[2], (Vector3){ 100,  100, 0});
+    //model.vertices[0].normal = (Vector3){0, 0, -1};
+    //model.vertices[1].normal = (Vector3){0, 0, -1};
+    //model.vertices[2].normal = (Vector3){0, 0, -1};
+    //model.index[0] = 0;     model.index[1] = 1;     model.index[2] = 2;
     addModel(&engine, &model);
+
+    Light light1;
+    Color lightColor;   lightColor.RGBA.r = 50;    lightColor.RGBA.g = 50;    lightColor.RGBA.b = 50;
+    initLight(&light1, AMBIENT, lightColor, (Vector3){0, 0, 0}, (Vector3){0, 0, 0}, (Vector3){0});
+    addLight(&engine, &light1);
+    Light light2;
+    lightColor.RGBA.r = 255;    lightColor.RGBA.g = 255;    lightColor.RGBA.b = 255;
+    initLight(&light2, POINT_LIGHT, lightColor, (Vector3){600, 0, 600}, (Vector3){1, 0, 1}, (Vector3){1, 0.0001f, 0.000001f});
+    addLight(&engine, &light2);
 
     double FPS_CAP       = 1.0 / 60;
     clock_t currentTime  = clock();
@@ -150,8 +158,8 @@ void RunMessageLoop() {
         if(msg.message == WM_QUIT)
             break;
 
-        currentTime = clock();
-        delta += (double)(currentTime - previousTime) / CLOCKS_PER_SEC;
+        currentTime  = clock();
+        delta       += (double)(currentTime - previousTime) / CLOCKS_PER_SEC;
         previousTime = currentTime;
 
         if(delta >= FPS_CAP){
@@ -161,14 +169,14 @@ void RunMessageLoop() {
         }
         frames++;
 
-        clearBuffer(&renderBuffer);
+        clearBuffer(&renderBuffer, (Color){ SKY_COLOR });
         renderModels(&engine, &renderBuffer);
         render(m_hwnd, &renderBuffer, FPS);
 
         if((double)(clock() - timer) >= CLOCKS_PER_SEC){
-            FPS = frames;
+            FPS    = frames;
             frames = 0;
-            timer = clock();
+            timer  = clock();
         }
     }
 }

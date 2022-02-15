@@ -7,11 +7,19 @@
 void initEngine(Engine* engine){
     initCamera(&engine -> camera);
     engine -> modelCount = 0;
+    engine -> lightCount = 0;
+    engine -> models = malloc(MAX_MODELS * sizeof(*engine -> models));
+    engine -> lights = malloc(MAX_LIGHTS * sizeof(*engine -> lights));
 }
 
 void addModel(Engine* engine, Model* model){
     engine -> models[engine -> modelCount] = model;
     engine -> modelCount++;
+}
+
+void addLight(Engine* engine, Light* light){
+    engine -> lights[engine -> lightCount] = light;
+    engine -> lightCount++;
 }
 
 void handleKeyDown(Engine* engine, WPARAM wParam){
@@ -39,7 +47,7 @@ void updateModels(Engine* engine){
 
 void renderModels(Engine* engine, RenderBuffer* renderBuffer){
     for(int i = 0; i < engine -> modelCount; i++)
-        renderModel(engine->models[i], renderBuffer);
+        renderModel(engine->models[i], engine, renderBuffer);
 }
 
 Vector3 applyPerspective(Vector3* vec, Camera* camera){

@@ -6,17 +6,22 @@
 #include "dllsupport.c"
 
 #include <windows.h>
+#include "Light.h"
 #include "Camera.h"
 #include "Model.h"
 
 typedef struct {
     Camera camera;
     int modelCount;
-    Model* models[5];
+    Model** models;
+    int lightCount;
+    Light** lights;
 } Engine;
 
 void DLL initEngine(Engine* engine);
+
 void DLL addModel(Engine* engine, Model* model);
+void DLL addLight(Engine* engine, Light* light);
 
 void DLL handleKeyDown(Engine* engine, WPARAM wParam);
 void DLL handleKeyUp(Engine* engine, WPARAM wParam);
